@@ -1,0 +1,19 @@
+validator:
+  import_allowlist:
+    - requests
+    - json
+    - datetime
+    - pathlib
+    - os.path
+    - re
+    - math
+    - typing
+    - urllib.parse
+
+paths:
+  generated_tools_dir: ./generated_tools
+  manifest_file: ./tools_manifest.json
+
+server:
+  name: genesis-mcp
+  version: 0.1.0
