@@ -8,8 +8,8 @@
 > References below to "Anthropic API wrapper" and to `ANTHROPIC_API_KEY`
 > error handling describe code that no longer exists.
 >
-> Current architecture: see `CLAUDE.md`.
-> Security posture: see `README.md` "Security Notes" and `SECURITY_FIXES_v0_1.md`.
+> Current architecture: see [`../../CLAUDE.md`](../../CLAUDE.md).
+> Security posture: see [`../../README.md`](../../README.md) "Security Notes" and [`../security/SECURITY_FIXES_v0_1.md`](../security/SECURITY_FIXES_v0_1.md).
 
 ---
 
