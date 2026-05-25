@@ -131,6 +131,111 @@ def handler(arguments: dict) -> dict:
     assert any(e.check == "no_side_effects" for e in errors)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# F-01 / F-02 regression tests — validator bypass via __builtins__ and getattr
+#
+# Each test uses the EXACT proof-of-concept code from SECURITY_AUDIT_REPORT.md.
+# The test passes when validate() returns a 'forbidden_name' error.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_f01_builtins_subscript_import_blocked():
+    """F-01 PoC: __builtins__['__import__'] + getattr(__builtins__, '__import__')
+    to load subprocess and run a command. Must be rejected."""
+    code = '''
+TOOL_SCHEMA = {
+    "name": "sys_info",
+    "description": "Returns OS information.",
+    "inputSchema": {"type": "object", "properties": {}, "required": []}
+}
+
+def handler(arguments: dict) -> dict:
+    bi = __builtins__["__import__"] if isinstance(__builtins__, dict) else getattr(__builtins__, "__import__")
+    sp = bi("subprocess")
+    r = sp.run(["cmd", "/c", "echo", "GENESIS_RCE"], capture_output=True, text=True)
+    return {"status": "success", "data": r.stdout.strip(), "message": "ok"}
+'''
+    errors = validate(code, existing_names=set())
+    assert any(e.check == "forbidden_name" for e in errors), \
+        f"F-01 PoC was not rejected. Errors: {[e.to_dict() for e in errors]}"
+
+
+def test_f02_builtins_subscript_eval_blocked():
+    """F-02 PoC: __builtins__['eval'] / getattr(__builtins__, 'eval')
+    to execute arbitrary Python. Must be rejected."""
+    code = '''
+TOOL_SCHEMA = {
+    "name": "calc",
+    "description": "Evaluates math.",
+    "inputSchema": {"type": "object", "properties": {"expr": {"type": "string"}}, "required": ["expr"]}
+}
+
+def handler(arguments: dict) -> dict:
+    fn = __builtins__["eval"] if isinstance(__builtins__, dict) else getattr(__builtins__, "eval")
+    return {"status": "success", "data": fn(arguments["expr"]), "message": "ok"}
+'''
+    errors = validate(code, existing_names=set())
+    assert any(e.check == "forbidden_name" for e in errors), \
+        f"F-02 PoC was not rejected. Errors: {[e.to_dict() for e in errors]}"
+
+
+def test_builtins_bare_name_reference_blocked():
+    """Any direct reference to the name __builtins__ is rejected."""
+    code = '''
+TOOL_SCHEMA = {
+    "name": "leak_builtins",
+    "description": "x",
+    "inputSchema": {"type": "object", "properties": {}, "required": []}
+}
+
+def handler(arguments: dict) -> dict:
+    b = __builtins__
+    return {"status": "success", "data": str(type(b)), "message": "ok"}
+'''
+    errors = validate(code, existing_names=set())
+    assert any(e.check == "forbidden_name" for e in errors), \
+        f"Bare __builtins__ reference was not rejected. Errors: {[e.to_dict() for e in errors]}"
+
+
+def test_getattr_call_blocked():
+    """getattr() as a reflection primitive is rejected, even on a benign target."""
+    code = '''
+TOOL_SCHEMA = {
+    "name": "reflect",
+    "description": "x",
+    "inputSchema": {"type": "object", "properties": {}, "required": []}
+}
+
+def handler(arguments: dict) -> dict:
+    target = "hello"
+    fn = getattr(target, "upper")
+    return {"status": "success", "data": fn(), "message": "ok"}
+'''
+    errors = validate(code, existing_names=set())
+    assert any(e.check == "forbidden_name" for e in errors), \
+        f"getattr() call was not rejected. Errors: {[e.to_dict() for e in errors]}"
+
+
+def test_attribute_dunder_blocked():
+    """Attribute access to forbidden dunder names on any object is rejected
+    (e.g. obj.__import__('subprocess')).
+    """
+    code = '''
+TOOL_SCHEMA = {
+    "name": "dunder_attr",
+    "description": "x",
+    "inputSchema": {"type": "object", "properties": {}, "required": []}
+}
+
+def handler(arguments: dict) -> dict:
+    obj = arguments
+    sp = obj.__import__("subprocess")
+    return {"status": "success", "data": None, "message": "ok"}
+'''
+    errors = validate(code, existing_names=set())
+    assert any(e.check == "forbidden_name" for e in errors), \
+        f"Attribute access .__import__ was not rejected. Errors: {[e.to_dict() for e in errors]}"
+
+
 def test_allowed_imports_pass():
     code = """
 import json

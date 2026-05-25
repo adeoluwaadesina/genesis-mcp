@@ -1,5 +1,18 @@
 # Genesis MCP — Claude Code Handover
 
+> **⚠️ PARTIALLY STALE — architecture pivoted post-build**
+>
+> This handover was written immediately after the initial scaffold. Since
+> then the code-generation path pivoted: `generator.py` no longer calls
+> the Anthropic API — it only builds a prompt string for the host LLM.
+> References below to "Anthropic API wrapper" and to `ANTHROPIC_API_KEY`
+> error handling describe code that no longer exists.
+>
+> Current architecture: see `CLAUDE.md`.
+> Security posture: see `README.md` "Security Notes" and `SECURITY_FIXES_v0_1.md`.
+
+---
+
 **Purpose:** This document records what was built, deviations from the spec, test coverage, and the audit checklist for the next reviewer (Codex/Cursor).
 
 **Source of truth:** [`GENESIS_MCP_HANDOVER.md`](GENESIS_MCP_HANDOVER.md) + [`HANDOVER_ADDENDUM.md`](HANDOVER_ADDENDUM.md)

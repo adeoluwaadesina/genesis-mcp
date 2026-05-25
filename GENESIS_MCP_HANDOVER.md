@@ -1,5 +1,25 @@
 # Genesis MCP — Build Handover & Architecture Document
 
+> **⚠️ HISTORICAL DOCUMENT — DOES NOT REFLECT SHIPPED ARCHITECTURE**
+>
+> This handover captures the **original design intent** (pre-scaffold,
+> May 2026). During the build the code-generation path pivoted: Genesis no
+> longer makes server-side Anthropic API calls. The host LLM (Claude
+> Desktop, Cursor) generates code and posts it back via `register_tool`.
+> References below to `generator.generate_tool()`, the `anthropic`
+> dependency, `ANTHROPIC_API_KEY`, and "Anthropic API costs per tool"
+> describe the design that was **not** built.
+>
+> Authoritative current sources:
+> - `CLAUDE.md` — current architecture, data flow, validator order
+> - `README.md` "Security Notes" — trust model and validator scope
+> - `SECURITY_FIXES_v0_1.md` — security fixes applied vs deferred
+>
+> This document is preserved for historical context (rationale, decision
+> log, original phasing) and is not updated as the codebase evolves.
+
+---
+
 **Audience:** Claude Code (consuming this to plan, scaffold, and build)
 **Author of spec:** Adeoluwa Adesina (planning phase, via Claude chat)
 **Status:** Pre-scaffold. Greenfield project.

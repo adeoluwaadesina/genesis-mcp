@@ -38,6 +38,17 @@ _FORBIDDEN_ATTR_CALLS = {
     ("subprocess", "check_output"), ("subprocess", "Popen"),
 }
 
+# F-01 / F-02 hardening: reflection primitives that allow indirect access
+# to forbidden builtins (e.g. __builtins__["__import__"] or
+# getattr(__builtins__, "eval")). A legitimate generated tool never needs
+# any of these.
+_FORBIDDEN_NAMES = {"__builtins__"}
+_FORBIDDEN_DUNDER_ATTRS = {
+    "__import__", "__builtins__", "__globals__",
+    "__loader__", "__getattribute__",
+}
+_FORBIDDEN_REFLECTION_CALLS = {"getattr", "globals", "locals", "vars"}
+
 
 @dataclass
 class ValidationError:
@@ -69,24 +80,29 @@ def validate(code: str, existing_names: set[str]) -> list[ValidationError]:
     if errors:
         return errors
 
-    # 4 — Required structure
+    # 4 — Forbidden names / reflection primitives (F-01, F-02 hardening)
+    errors.extend(_check_forbidden_names(tree))
+    if errors:
+        return errors
+
+    # 5 — Required structure
     errors.extend(_check_required_structure(tree))
     if errors:
         return errors
 
-    # 5 — Schema validity (needs TOOL_SCHEMA extractable from AST)
+    # 6 — Schema validity (needs TOOL_SCHEMA extractable from AST)
     schema_errors, schema_value = _check_schema_validity(tree)
     errors.extend(schema_errors)
     if errors:
         return errors
 
-    # 6 — Name uniqueness
+    # 7 — Name uniqueness
     if schema_value is not None:
         errors.extend(_check_name_uniqueness(schema_value, existing_names))
         if errors:
             return errors
 
-    # 7 — No top-level side effects
+    # 8 — No top-level side effects
     errors.extend(_check_no_side_effects(tree))
 
     return errors
@@ -152,6 +168,33 @@ def _check_forbidden_calls(tree: ast.Module) -> list[ValidationError]:
                             f"Call to forbidden function '{node.func.value.id}.{node.func.attr}'.",
                             getattr(node, "lineno", None),
                         ))
+    return errors
+
+
+def _check_forbidden_names(tree: ast.Module) -> list[ValidationError]:
+    """Reject reflection primitives used to bypass forbidden-call checks (F-01, F-02)."""
+    errors = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name) and node.id in _FORBIDDEN_NAMES:
+            errors.append(ValidationError(
+                "forbidden_name",
+                f"Reference to '{node.id}' is not allowed (bypass primitive).",
+                getattr(node, "lineno", None),
+            ))
+        elif isinstance(node, ast.Attribute) and node.attr in _FORBIDDEN_DUNDER_ATTRS:
+            errors.append(ValidationError(
+                "forbidden_name",
+                f"Attribute access '.{node.attr}' is not allowed (bypass primitive).",
+                getattr(node, "lineno", None),
+            ))
+        elif (isinstance(node, ast.Call)
+              and isinstance(node.func, ast.Name)
+              and node.func.id in _FORBIDDEN_REFLECTION_CALLS):
+            errors.append(ValidationError(
+                "forbidden_name",
+                f"Call to reflection builtin '{node.func.id}' is not allowed.",
+                getattr(node, "lineno", None),
+            ))
     return errors
 
 

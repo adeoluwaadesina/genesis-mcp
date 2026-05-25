@@ -1,5 +1,15 @@
 # Genesis MCP — Handover Addendum
 
+> **⚠️ HISTORICAL DOCUMENT — DOES NOT REFLECT SHIPPED ARCHITECTURE**
+>
+> Captures design decisions made before the build. The code-generation
+> architecture pivoted during implementation: Genesis does not make
+> server-side Anthropic API calls; the host LLM generates code. The "API
+> cost per generation" notes below describe a path that was not built.
+> See `CLAUDE.md` and `SECURITY_FIXES_v0_1.md` for current architecture.
+
+---
+
 **Purpose:** This file captures decisions made after the initial handover doc (`GENESIS_MCP_HANDOVER.md`) in response to clarifying questions raised during the build planning phase. Treat these as authoritative — they override or refine the original spec.
 
 **Read this together with `GENESIS_MCP_HANDOVER.md`.**
