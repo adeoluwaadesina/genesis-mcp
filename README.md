@@ -265,7 +265,7 @@ following are all possible from validated code today:
 Hardened sandboxing (subprocess isolation, egress allowlist, filesystem
 confinement, path-traversal hardening, manifest validation) is planned for v0.2.
 Until then, treat every line in `generated_tools/` as code you are personally
-responsible for. See [`SECURITY_FIXES_v0_1.md`](SECURITY_FIXES_v0_1.md) for the
+responsible for. See [`docs/security/SECURITY_FIXES_v0_1.md`](docs/security/SECURITY_FIXES_v0_1.md) for the
 explicit list of issues fixed in v0.1 versus deferred.
 
 ---
@@ -282,6 +282,19 @@ Run a single test file:
 ```bash
 pytest tests/test_validator.py -v
 ```
+
+---
+
+## Documentation
+
+- [`docs/security/`](docs/security/) — security audit trail
+  ([`SECURITY_AUDIT_REPORT.md`](docs/security/SECURITY_AUDIT_REPORT.md),
+  [`PRE_AUDIT_REPORT.md`](docs/security/PRE_AUDIT_REPORT.md),
+  [`SECURITY_FIXES_v0_1.md`](docs/security/SECURITY_FIXES_v0_1.md),
+  [`SECURITY_REVERIFY_v0_1.md`](docs/security/SECURITY_REVERIFY_v0_1.md))
+- [`docs/history/`](docs/history/) — original planning artifacts, marked as
+  historical. Preserved for design-decision context; **does not reflect the
+  shipped architecture.** See `CLAUDE.md` for the current source of truth.
 
 ---
 

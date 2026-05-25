@@ -83,4 +83,4 @@ Every generated tool must have:
 
 ### Security posture (v0.1)
 
-The validator is the entire trust boundary — there is no sandbox. v0.1 is local, single-user only. See `README.md` "Security Notes" and `SECURITY_FIXES_v0_1.md` for what is and is not blocked, and what is deferred to v0.2.
+The validator is the entire trust boundary — there is no sandbox. v0.1 is local, single-user only. See `README.md` "Security Notes" and [`docs/security/SECURITY_FIXES_v0_1.md`](docs/security/SECURITY_FIXES_v0_1.md) for what is and is not blocked, and what is deferred to v0.2.

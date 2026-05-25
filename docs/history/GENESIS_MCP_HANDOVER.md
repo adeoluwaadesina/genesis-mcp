@@ -11,9 +11,9 @@
 > describe the design that was **not** built.
 >
 > Authoritative current sources:
-> - `CLAUDE.md` — current architecture, data flow, validator order
-> - `README.md` "Security Notes" — trust model and validator scope
-> - `SECURITY_FIXES_v0_1.md` — security fixes applied vs deferred
+> - [`../../CLAUDE.md`](../../CLAUDE.md) — current architecture, data flow, validator order
+> - [`../../README.md`](../../README.md) "Security Notes" — trust model and validator scope
+> - [`../security/SECURITY_FIXES_v0_1.md`](../security/SECURITY_FIXES_v0_1.md) — security fixes applied vs deferred
 >
 > This document is preserved for historical context (rationale, decision
 > log, original phasing) and is not updated as the codebase evolves.

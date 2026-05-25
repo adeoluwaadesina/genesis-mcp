@@ -6,7 +6,7 @@
 > architecture pivoted during implementation: Genesis does not make
 > server-side Anthropic API calls; the host LLM generates code. The "API
 > cost per generation" notes below describe a path that was not built.
-> See `CLAUDE.md` and `SECURITY_FIXES_v0_1.md` for current architecture.
+> See [`../../CLAUDE.md`](../../CLAUDE.md) and [`../security/SECURITY_FIXES_v0_1.md`](../security/SECURITY_FIXES_v0_1.md) for current architecture.
 
 ---
 
